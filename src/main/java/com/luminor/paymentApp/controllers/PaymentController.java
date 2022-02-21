@@ -3,6 +3,7 @@ package com.luminor.paymentApp.controllers;
 import com.luminor.paymentApp.exceptions.IllegalCountryCodeException;
 import com.luminor.paymentApp.handlers.CsvHandler;
 import com.luminor.paymentApp.model.Payment;
+import com.luminor.paymentApp.model.PaymentDao;
 import com.luminor.paymentApp.model.PaymentDto;
 import com.luminor.paymentApp.service.PaymentService;
 import fr.marcwrobel.jbanking.iban.IbanFormatException;
@@ -55,7 +56,7 @@ public class PaymentController {
         if (payments != null) {
             Iterable<Payment> persistedPayments = paymentService.makePayments(payments);
             Integer sz = ((Collection<?>) persistedPayments).size();
-            String response = sz + "valid entries were found & saved!";
+            String response = sz + " valid entries were found & saved!";
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -71,7 +72,7 @@ public class PaymentController {
             try {
                 Iterable<Payment> persistedPayments = paymentService.makePayments(payments);
                 Integer sz = ((Collection<?>) persistedPayments).size();
-                String response = sz + "valid entries were found & saved!";
+                String response = sz + " valid entries were found & saved!";
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
@@ -88,8 +89,7 @@ public class PaymentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
         Pageable pageable = PageRequest.of(page, size);
-        List<Payment> paymentList;
-        Page<Payment> payments;
+        Page<PaymentDao> payments;
         try{
             if (debtorIban == null){
                 payments = paymentService.getPayments(pageable);
@@ -97,9 +97,28 @@ public class PaymentController {
             else{
                 payments = paymentService.getPaymentsByDebtorIban(debtorIban, pageable);
             }
-            paymentList = payments.getContent();
             Map<String, Object> response = new HashMap<>();
-            response.put("Payments", paymentList);
+            response.put("Payments", payments.getContent());
+            response.put("Current_Page", payments.getNumber());
+            response.put("Payments_Count", payments.getTotalElements());
+            response.put("Pages_Count", payments.getTotalPages());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "/payments-persisted")
+    public ResponseEntity<?> getPersistedPayments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, Object> response = new HashMap<>();
+        Page<Payment> payments;
+        try{
+            payments = paymentService.getOriginalPayments(pageable);
+            response.put("Payments", payments.getContent());
             response.put("Current_Page", payments.getNumber());
             response.put("Payments_Count", payments.getTotalElements());
             response.put("Pages_Count", payments.getTotalPages());

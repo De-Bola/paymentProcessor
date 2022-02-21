@@ -7,5 +7,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Mapper(componentModel = "spring")
-public interface PaymentMapper extends MapperInterface<Payment, PaymentDto> {
+public interface PaymentDtoMapper extends MapperInterface<Payment, PaymentDto> {
 }

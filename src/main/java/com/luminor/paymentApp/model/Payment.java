@@ -1,6 +1,7 @@
 package com.luminor.paymentApp.model;
 
 import fr.marcwrobel.jbanking.iban.Iban;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -24,6 +25,10 @@ public class Payment {
     @Column
     private String created_at;
 
+    @Column
+    @Nullable
+    private String location;
+
     public Payment(){this.created_at = LocalDateTime.now().toString();}
 
     public UUID getPayment_id() {
@@ -46,7 +51,7 @@ public class Payment {
         this.amount = BigDecimal.valueOf(Double.parseDouble(amount));
     }
 
-    public String getIban() {
+    public String getDebtorIban() {
         return debtorIban;
     }
 
@@ -60,6 +65,15 @@ public class Payment {
 
     public void setCreated_at(String created_at) {
         this.created_at = LocalDateTime.now().toString();
+    }
+
+    @Nullable
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(@Nullable String location) {
+        this.location = location;
     }
 
     @Override
