@@ -109,6 +109,10 @@ public class PaymentController {
         }
     }
 
+    // for getting all payments including ip-address info
+    // returns 200 and all found entries when all goes well
+    // this endpoint is just for functional testing purposes
+    // todo: decode country/location info from logged ip-address
     @GetMapping(value = "/payments-persisted")
     public ResponseEntity<?> getPersistedPayments(
             @RequestParam(defaultValue = "0") int page,
