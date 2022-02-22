@@ -13,7 +13,6 @@ import fr.marcwrobel.jbanking.iban.IbanFormatException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,12 +26,17 @@ public class PaymentService {
     private final PaymentRepository  paymentRepository;
     private final PaymentDtoMapper mapper;
     private final PaymentDaoMapper daoMapper;
-    private String ipLocation = new String();
+    private String ipAddress = new String(); //"41.86.128.10";// NG: Nigeria IP as an example, uncommented line 34 in locationhandler
+    private final LocationService locationService;
 
-    public PaymentService(PaymentRepository repository, PaymentDtoMapper paymentDtoMapper, PaymentDaoMapper paymentDaoMapper){
+    public PaymentService(PaymentRepository repository,
+                          PaymentDtoMapper paymentDtoMapper,
+                          PaymentDaoMapper paymentDaoMapper,
+                          LocationService service){
         this.paymentRepository = repository;
         this.mapper = paymentDtoMapper;
         this.daoMapper = paymentDaoMapper;
+        this.locationService = service;
     }
 
     /* for singular payment entries */
@@ -97,10 +101,10 @@ public class PaymentService {
     }
 
     public void storeIpAddress(String ipAddress) {
-        this.ipLocation = ipAddress;
+        this.ipAddress = ipAddress;
     }
 
     public String getIpLocation() {
-        return this.ipLocation;
+        return locationService.getCountryInfo(this.ipAddress);
     }
 }

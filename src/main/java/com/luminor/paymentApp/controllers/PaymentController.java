@@ -36,13 +36,13 @@ public class PaymentController {
     // returns status code 201 when all goes well
     @PostMapping(value = "/payments")
     public ResponseEntity<?> makePayment(@RequestBody PaymentDto paymentDto) {
-
         try {
             if(paymentService.makePayment(paymentDto) != null){
                 return new ResponseEntity<>(HttpStatus.CREATED);
             }
         } catch (IllegalCountryCodeException | IbanFormatException e) {
             e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -75,7 +75,7 @@ public class PaymentController {
                 String response = sz + " valid entries were found & saved!";
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
             } catch (Exception e){
-                return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -105,7 +105,7 @@ public class PaymentController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -129,7 +129,7 @@ public class PaymentController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
